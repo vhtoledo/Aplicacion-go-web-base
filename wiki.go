@@ -52,6 +52,16 @@ func editHandler(w http.ResponseWriter, r *http.Request){
 	renderTemplate(w, "edit", p)
 }
 
+// Funcion para guardar paginas
+func saveHandler(w http.ResponseWriter, r *http.Request){
+	title := r.URL.Path[len("/save/"):]
+	body := r.FormValue("body")
+	p := &Page{Title: title, Body: []byte(body)}
+	p.save()
+
+	http.Redirect(w, r, "/view/"+title, http.StatusFound)
+}
+
 // Funcion para renderizar plantillas
 func renderTemplate(w http.ResponseWriter, tmpl string, p*Page){
 	t, _ := template.ParseFiles(tmpl + ".html")
@@ -63,6 +73,7 @@ func main() {
 
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
+	http.HandleFunc("/save/", saveHandler)
 
 	//Crear servidor
 	log.Fatal(http.ListenAndServe(":8080", nil))
