@@ -33,15 +33,21 @@ func loadPage(title string) (*Page, error) {
 // Funcion para responder al cliente (visualizar y cargar pagina)
 func viewHandler(w http.ResponseWriter, r *http.Request){
 	title := r.URL.Path[len("/view/"):]
-	p, _ := loadPage(title)
-	
+	p, err := loadPage(title)
+	if err != nil {
+		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
+		return
+	}
 	renderTemplate(w, "view", p)
 }
 
 // Funcion para editar paginas 
 func editHandler(w http.ResponseWriter, r *http.Request){
 	title := r.URL.Path[len("/edit/"):]
-	p, _ := loadPage(title)
+	p, err := loadPage(title)
+	if err != nil {
+		p = &Page{Title: title}
+	}
 
 	renderTemplate(w, "edit", p)
 }
