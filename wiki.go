@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -33,18 +34,29 @@ func loadPage(title string) (*Page, error) {
 func viewHandler(w http.ResponseWriter, r *http.Request){
 	title := r.URL.Path[len("/view/"):]
 	p, _ := loadPage(title)
-	fmt.Fprintf(w, "<h1>%s</h1> <div>%s</div>", p.Title, p.Body)
+	
+	renderTemplate(w, "view", p)
+}
+
+// Funcion para editar paginas 
+func editHandler(w http.ResponseWriter, r *http.Request){
+	title := r.URL.Path[len("/edit/"):]
+	p, _ := loadPage(title)
+
+	renderTemplate(w, "edit", p)
+}
+
+// Funcion para renderizar plantillas
+func renderTemplate(w http.ResponseWriter, tmpl string, p*Page){
+	t, _ := template.ParseFiles(tmpl + ".html")
+	t.Execute(w, p)
 }
 
 // Funcion princpal
 func main() {
-	//p1 := &Page{Title: "TestPage", Body: []byte("Esta es una pagina de muestra")}
-	//p1.save()
-
-	//p2, _ := loadPage("TestPage")
-	//fmt.Println(string(p2.Body))
 
 	http.HandleFunc("/view/", viewHandler)
+	http.HandleFunc("/edit/", editHandler)
 
 	//Crear servidor
 	log.Fatal(http.ListenAndServe(":8080", nil))
