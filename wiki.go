@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 )
 
@@ -27,11 +29,21 @@ func loadPage(title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
+// Funcion para responder al cliente
+func handler(w http.ResponseWriter, r *http.Request){
+	fmt.Fprintf(w, "Hola %s", r.URL.Path[1:])
+}
+
 // Funcion princpal
 func main() {
-	p1 := &Page{Title: "TestPage", Body: []byte("Esta es una pagina de muestra")}
-	p1.save()
+	//p1 := &Page{Title: "TestPage", Body: []byte("Esta es una pagina de muestra")}
+	//p1.save()
 
-	p2, _ := loadPage("TestPage")
-	fmt.Println(string(p2.Body))
+	//p2, _ := loadPage("TestPage")
+	//fmt.Println(string(p2.Body))
+
+	http.HandleFunc("/", handler)
+
+	//Crear servidor
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
